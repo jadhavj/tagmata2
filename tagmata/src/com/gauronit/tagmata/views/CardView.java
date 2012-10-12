@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * Card.java
- *
- * Created on Dec 13, 2011, 3:54:33 PM
- */
 package com.gauronit.tagmata.views;
 
 import com.gauronit.tagmata.Main;
@@ -15,10 +5,6 @@ import com.gauronit.tagmata.core.CardSnapshot;
 import com.gauronit.tagmata.core.Indexer;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author jjayesh
- */
 public class CardView extends javax.swing.JDialog {
 
     String indexDisplayName = null;
@@ -43,6 +29,9 @@ public class CardView extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * @wbp.parser.constructor
+     */
     public CardView(CardSnapshot cardSnap, java.awt.Frame parent, boolean modal) {
         this(parent, modal);
         this.cardSnap = cardSnap;

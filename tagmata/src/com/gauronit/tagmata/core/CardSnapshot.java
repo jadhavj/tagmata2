@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gauronit.tagmata.core;
 
 import org.apache.lucene.document.Document;
 
-/**
- *
- * @author jjayesh
- */
 public class CardSnapshot {
 
     public String getHighlights() {

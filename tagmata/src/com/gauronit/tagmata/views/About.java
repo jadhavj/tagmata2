@@ -1,6 +1,3 @@
-/*
- * MainAboutBox.java
- */
 package com.gauronit.tagmata.views;
 
 import java.awt.Color;

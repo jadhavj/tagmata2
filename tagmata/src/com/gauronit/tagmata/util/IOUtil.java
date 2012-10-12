@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gauronit.tagmata.util;
 
 import java.io.File;
 
-/**
- *
- * @author jjayesh
- */
 public class IOUtil {
 
     public static boolean deleteDir(File dir) {

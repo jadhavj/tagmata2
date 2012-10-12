@@ -1,6 +1,3 @@
-/*
- * MainView.java
- */
 package com.gauronit.tagmata.views;
 
 import java.awt.AWTException;
@@ -49,9 +46,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-/**
- * The application's main frame.
- */
 public class MainView extends JFrame {
 
     ResourceMap resourceMap;

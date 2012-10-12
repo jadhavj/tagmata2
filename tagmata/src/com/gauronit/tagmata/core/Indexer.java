@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gauronit.tagmata.core;
 
 import com.gauronit.tagmata.util.IOUtil;
@@ -43,10 +39,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.util.Version;
 
-/**
- *
- * @author jjayesh
- */
 public class Indexer {
 
     private static boolean loaded = false;

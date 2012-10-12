@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gauronit.tagmata.util;
 
 import org.apache.lucene.index.Term;
@@ -11,10 +7,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 
-/**
- *
- * @author jjayesh
- */
 public class IndexerUtil {
 
     public static Query getTokenizedQuery(BooleanQuery query, String field, String searchText, boolean superFuzzy) {

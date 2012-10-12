@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.gauronit.tagmata.util;
 
 import java.io.FileWriter;
 
-/**
- *
- * @author jjayesh
- */
 public class StringUtil {
 
     public static String removeSpecialChars(String source) {
