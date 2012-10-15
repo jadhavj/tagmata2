@@ -413,6 +413,13 @@ public class MainView extends JFrame {
                 return String.class;
             }
         }
+        
+        public boolean isCellEditable(int row, int col) {
+        	if (getValueAt(row, col).equals("General")) {
+        		return false;
+        	}
+        	return true;
+        }
     }
 
     @Action
