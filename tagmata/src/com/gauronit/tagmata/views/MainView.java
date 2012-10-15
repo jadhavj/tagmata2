@@ -69,7 +69,18 @@ public class MainView extends JFrame {
         mainView = this;
         initComponents();
         this.setSize(900, 567);
+
+        // Get the size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         
+        // Determine the new location of the window
+        int w = getSize().width;
+        int h = getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+        
+        // Move the window
+        setLocation(x, y);        
         
         Main.getApplication().getMainFrame().setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 

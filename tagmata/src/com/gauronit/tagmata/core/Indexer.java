@@ -404,7 +404,6 @@ public class Indexer {
         try {
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Failed to Initialize", ex);
-
         }
     }
 }

@@ -14,6 +14,10 @@ import com.gauronit.tagmata.Main;
 import com.gauronit.tagmata.core.CardSnapshot;
 import com.gauronit.tagmata.core.Indexer;
 import javax.swing.JOptionPane;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.GroupLayout;
+import javax.swing.JLabel;
 
 public class CardView extends javax.swing.JDialog {
 
@@ -31,12 +35,15 @@ public class CardView extends javax.swing.JDialog {
             textTxtBox.setText(cardSnap.getText());
             indexName = cardSnap.getDoc().get("indexName");
             indexDisplayName = MainView.mainView.getIndexDisplayName(indexName);
-            indexNameLbl.setText("Index Selected is '" + indexDisplayName + "'");
+            indexNameLbl.setText("Card stored in index, '" + indexDisplayName + "'");
         } else {
             indexDisplayName = MainView.mainView.getSelectedIndexDisplayName();
             indexName = MainView.mainView.getSelectedIndexName();
             indexNameLbl.setText("Index Selected is '" + indexDisplayName + "'");
         }
+        setSize(600, 500);
+        textTxtBox.setSize(540, 440);
+        
     }
 
     /**
@@ -51,7 +58,7 @@ public class CardView extends javax.swing.JDialog {
             textTxtBox.setText(cardSnap.getText());
             indexName = cardSnap.getDoc().get("indexName");
             indexDisplayName = MainView.mainView.getIndexDisplayName(indexName);
-            indexNameLbl.setText("Index Selected is '" + indexDisplayName + "'");
+            indexNameLbl.setText("Card stored in index, '" + indexDisplayName + "'");
         } else {
             indexDisplayName = MainView.mainView.getSelectedIndexDisplayName();
             indexName = MainView.mainView.getSelectedIndexName();
@@ -73,7 +80,7 @@ public class CardView extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         tagsTxtBox = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        textScrollPane = new javax.swing.JScrollPane();
         textTxtBox = new javax.swing.JEditorPane();
         addBtn = new javax.swing.JButton();
         indexNameLbl = new javax.swing.JLabel();
@@ -84,7 +91,7 @@ public class CardView extends javax.swing.JDialog {
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setName("Form"); // NOI18N
 
-        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setText("Title"); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
         titleTxtBox.setText(resourceMap.getString("titleTxtBox.text")); // NOI18N
@@ -95,7 +102,7 @@ public class CardView extends javax.swing.JDialog {
             }
         });
 
-        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setText("Tags"); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
         tagsTxtBox.setText(resourceMap.getString("tagsTxtBox.text")); // NOI18N
@@ -104,12 +111,12 @@ public class CardView extends javax.swing.JDialog {
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
+        textScrollPane.setName("jScrollPane1"); // NOI18N
 
         textTxtBox.setName("textTxtBox"); // NOI18N
-        jScrollPane1.setViewportView(textTxtBox);
+        textScrollPane.setViewportView(textTxtBox);
 
-        addBtn.setText(resourceMap.getString("addBtn.text")); // NOI18N
+        addBtn.setText("Save Card"); // NOI18N
         addBtn.setName("addBtn"); // NOI18N
         addBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,49 +127,56 @@ public class CardView extends javax.swing.JDialog {
         indexNameLbl.setFont(resourceMap.getFont("indexNameLbl.font")); // NOI18N
         indexNameLbl.setText(resourceMap.getString("indexNameLbl.text")); // NOI18N
         indexNameLbl.setName("indexNameLbl"); // NOI18N
+        
+        JLabel lblText = new JLabel();
+        lblText.setText("Text");
+        lblText.setName("jLabel2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(titleTxtBox, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
-                            .addComponent(tagsTxtBox, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addBtn, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(indexNameLbl, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE))
-                .addContainerGap())
+        	layout.createParallelGroup(Alignment.LEADING)
+        		.addGroup(layout.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        				.addComponent(textScrollPane, GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+        				.addComponent(addBtn, Alignment.TRAILING)
+        				.addComponent(indexNameLbl, GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+        				.addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 352, GroupLayout.PREFERRED_SIZE)
+        				.addGroup(layout.createSequentialGroup()
+        					.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        						.addComponent(jLabel2)
+        						.addComponent(jLabel1))
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGroup(layout.createParallelGroup(Alignment.LEADING)
+        						.addComponent(tagsTxtBox, GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
+        						.addComponent(titleTxtBox, GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)))
+        				.addComponent(lblText, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+        			.addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(11, 11, 11)
-                .addComponent(indexNameLbl)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(titleTxtBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(tagsTxtBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3)
-                .addGap(1, 1, 1)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(addBtn)
-                .addContainerGap())
+        	layout.createParallelGroup(Alignment.LEADING)
+        		.addGroup(layout.createSequentialGroup()
+        			.addGap(11)
+        			.addComponent(indexNameLbl)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(layout.createParallelGroup(Alignment.LEADING, false)
+        				.addComponent(jLabel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(titleTxtBox))
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
+        			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(jLabel2)
+        				.addComponent(tagsTxtBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
+        			.addComponent(lblText)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(textScrollPane, GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(addBtn)
+        			.addContainerGap())
         );
+        getContentPane().setLayout(layout);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -221,9 +235,8 @@ public class CardView extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane textScrollPane;
     private javax.swing.JTextField tagsTxtBox;
     private javax.swing.JEditorPane textTxtBox;
     private javax.swing.JTextField titleTxtBox;
-    // End of variables declaration//GEN-END:variables
 }
