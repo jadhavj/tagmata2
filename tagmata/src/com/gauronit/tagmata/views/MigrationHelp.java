@@ -24,6 +24,7 @@ public class MigrationHelp extends JDialog {
 	 */
 	public MigrationHelp(JFrame parent, boolean modal) {
 		super(parent, modal);
+		setTitle("Migration Help");
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

@@ -113,7 +113,7 @@ public class Indexer {
 	private synchronized void loadIndexes() throws Exception {
 		try {
 			Properties props = new Properties();
-			props.load(new FileInputStream(new File("indexer.properties")));
+			//props.load(new FileInputStream(new File("indexer.properties")));
 			indexDir = new File(".").getCanonicalPath() + File.separator
 					+ "indexes"; // props.getProperty("indexDir");
 			IndexReader ir = null;

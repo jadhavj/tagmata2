@@ -55,6 +55,7 @@ import com.gauronit.tagmata.util.StringUtil;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JMenuItem;
 
 public class MainView extends JFrame {
 
@@ -1142,6 +1143,14 @@ public class MainView extends JFrame {
 				helpMenuItemActionPerformed(evt);
 			}
 		});
+		
+		mntmMigrationHelp = new JMenuItem("Migration Help");
+		mntmMigrationHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new MigrationHelp(MainView.mainView, true).setVisible(true);
+			}
+		});
+		helpMenu.add(mntmMigrationHelp);
 		helpMenu.add(helpMenuItem);
 
 		aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
@@ -1791,4 +1800,5 @@ public class MainView extends JFrame {
 	private final Icon[] busyIcons = new Icon[15];
 	private int busyIconIndex = 0;
 	private JDialog aboutBox;
+	private JMenuItem mntmMigrationHelp;
 }
