@@ -11,7 +11,6 @@
 package com.gauronit.tagmata.views;
 
 import java.awt.AWTException;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -31,11 +30,16 @@ import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultRowSorter;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
@@ -51,12 +55,8 @@ import org.jdesktop.application.TaskMonitor;
 import com.gauronit.tagmata.Main;
 import com.gauronit.tagmata.core.CardSnapshot;
 import com.gauronit.tagmata.core.Indexer;
+import com.gauronit.tagmata.util.SettingsUtil;
 import com.gauronit.tagmata.util.StringUtil;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JMenuItem;
-import javax.swing.JMenu;
 
 public class MainView extends JFrame {
 
@@ -151,13 +151,6 @@ public class MainView extends JFrame {
 						}
 					}
 				});
-
-		// -- FIXME
-		allChkBox.setSelected(true);
-		tagsChkBox.setSelected(true);
-		titleChkBox.setSelected(true);
-		textChkBox.setSelected(true);
-		// --
 
 		loadIndexes();
 
@@ -271,6 +264,61 @@ public class MainView extends JFrame {
 		Main.getApplication().getMainFrame().setVisible(false);
 		refreshBookmarks();
 
+		DefaultRowSorter sorter = ((DefaultRowSorter) indexesTable
+				.getRowSorter());
+		ArrayList list = new ArrayList();
+		list.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+		sorter.setSortKeys(list);
+		sorter.sort();
+
+		loadSettings();
+	}
+
+	public void saveSettings() {
+		// TODO Auto-generated method stub
+		SettingsUtil.saveSearchFields(getSearchFields());
+		SettingsUtil.saveSuperFuzzy(superFuzzy.isSelected());
+
+		// Save selected indexes --
+		DefaultTableModel model = (DefaultTableModel) indexesTable.getModel();
+		int indCount = model.getRowCount();
+		String selInd = "";
+		if (searchAllIndices.isSelected()) {
+			selInd = "all,";
+		}
+		for (int i = 0; i < indCount; i++) {
+			if ((boolean) model.getValueAt(i, 0)) {
+				selInd += model.getValueAt(i, 1) + ",";
+			}
+		}
+		SettingsUtil.saveSelectedIndexes(selInd.split(","));
+		// --
+	}
+
+	private void loadSettings() {
+		setSearchFields(SettingsUtil.getSearchFields());
+		superFuzzy.setSelected(SettingsUtil.getSuperFuzzy());
+
+		// Enable selected indexes for searching --
+		searchAllIndices.setSelected(false);
+		String[] selInd = SettingsUtil.getSelectedIndexes();
+		DefaultTableModel model = (DefaultTableModel) indexesTable.getModel();
+		int indCount = model.getRowCount();
+		for (int i = 0; i < indCount; i++) {
+			for (int j = 0; j < selInd.length; j++) {
+				if (model.getValueAt(i, 1).toString().equals(selInd[j].trim())) {
+					model.setValueAt(true, i, 0);
+				}
+				if (selInd[j].equals("all")) {
+					searchAllIndices.setSelected(true);
+				}
+				if (searchAllIndices.isSelected()) {
+					model.setValueAt(true, i, 0);
+				}
+			}
+		}
+		indexesTable.repaint();
+		// --
 	}
 
 	private void loadIndexes() {
@@ -292,7 +340,7 @@ public class MainView extends JFrame {
 			Indexes.Index index = indexEntry.getValue();
 			tm.insertRow(
 					i,
-					new Object[] { true, index.getDisplayName(),
+					new Object[] { false, index.getDisplayName(),
 							index.getIndexName() });
 			i++;
 		}
@@ -520,9 +568,11 @@ public class MainView extends JFrame {
 		deleteCardLbl = new javax.swing.JLabel();
 		deleteCardLbl.setToolTipText("Delete selected cards");
 		superFuzzy = new javax.swing.JCheckBox();
-		superFuzzy.setToolTipText("<html>Search cards in 'Super Fuzzy' mode. <br/>For e.g. a search text 'demo' will include cards with <br/>'demographics', 'demonstration', etc. in their fields</html>");
+		superFuzzy
+				.setToolTipText("<html>Search cards in 'Super Fuzzy' mode. <br/>For e.g. a search text 'demo' will include cards with <br/>'demographics', 'demonstration', etc. in their fields</html>");
 		addBookmarkLbl = new javax.swing.JLabel();
-		addBookmarkLbl.setToolTipText("Save selected cards as 'Quick Cards' for quick reference");
+		addBookmarkLbl
+				.setToolTipText("Save selected cards as 'Quick Cards' for quick reference");
 		listAllCardsLbl = new javax.swing.JLabel();
 		listAllCardsLbl.setToolTipText("List all cards");
 		clearResultsLbl = new javax.swing.JLabel();
@@ -1244,7 +1294,7 @@ public class MainView extends JFrame {
 
 		setContentPane(mainPanel);
 		setJMenuBar(menuBar);
-		
+
 		mnSync = new JMenu("Sync");
 		menuBar.add(mnSync);
 	}// </editor-fold>//GEN-END:initComponents
@@ -1485,7 +1535,7 @@ public class MainView extends JFrame {
 	}// GEN-LAST:event_deleteCardLblMouseClicked
 
 	private void addBookmarkLblMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_addBookmarkLblMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		if (results.getModel().getSize() != 0
 				&& results.getSelectedIndices().length != 0) {
 			try {
@@ -1505,7 +1555,7 @@ public class MainView extends JFrame {
 	}// GEN-LAST:event_addBookmarkLblMouseClicked
 
 	private void quickCardsMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_quickCardsMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		if (evt.getClickCount() == 2 && !evt.isConsumed()) {
 			if (quickCards.getModel().getSize() != 0) {
 				CardSnapshot cardSnap = bookmarks.get(quickCards
@@ -1525,7 +1575,7 @@ public class MainView extends JFrame {
 	}// GEN-LAST:event_quickCardsMouseClicked
 
 	private void deleteQuickCardMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_deleteQuickCardMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		if (quickCards.getModel().getSize() != 0
 				&& quickCards.getSelectedIndices().length != 0) {
 			try {
@@ -1543,7 +1593,7 @@ public class MainView extends JFrame {
 	}// GEN-LAST:event_deleteQuickCardMouseClicked
 
 	private void listAllCardsLblMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_listAllCardsLblMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		String temp = queryText;
 		queryText = "";
 		fillResults();
@@ -1551,18 +1601,18 @@ public class MainView extends JFrame {
 	}// GEN-LAST:event_listAllCardsLblMouseClicked
 
 	private void clearResultsLblMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_clearResultsLblMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		cardSnaps = new ArrayList();
 		((DefaultListModel) results.getModel()).removeAllElements();
 	}// GEN-LAST:event_clearResultsLblMouseClicked
 
 	private void helpMenuItemMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_helpMenuItemMouseClicked
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 
 	}// GEN-LAST:event_helpMenuItemMouseClicked
 
 	private void helpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_helpMenuItemActionPerformed
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 		try {
 			java.net.URI uri = new java.net.URI(
@@ -1761,6 +1811,22 @@ public class MainView extends JFrame {
 			}
 		}
 		return null;
+	}
+
+	public boolean[] getSearchFields() {
+		return new boolean[] { allChkBox.isSelected(),
+				titleChkBox.isSelected(), tagsChkBox.isSelected(),
+				textChkBox.isSelected(), titleChecked, tagsChecked, textChecked };
+	}
+
+	public void setSearchFields(boolean[] values) {
+		allChkBox.setSelected(values[0]);
+		titleChkBox.setSelected(values[1]);
+		tagsChkBox.setSelected(values[2]);
+		textChkBox.setSelected(values[3]);
+		titleChecked = values[4];
+		tagsChecked = values[5];
+		textChecked = values[6];
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
