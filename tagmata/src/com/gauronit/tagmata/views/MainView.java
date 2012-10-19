@@ -56,6 +56,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JMenuItem;
+import javax.swing.JMenu;
 
 public class MainView extends JFrame {
 
@@ -1228,6 +1229,9 @@ public class MainView extends JFrame {
 
 		setContentPane(mainPanel);
 		setJMenuBar(menuBar);
+		
+		mnSync = new JMenu("Sync");
+		menuBar.add(mnSync);
 	}// </editor-fold>//GEN-END:initComponents
 
 	private boolean titleChecked = true;
@@ -1792,4 +1796,5 @@ public class MainView extends JFrame {
 	private final Icon[] busyIcons = new Icon[15];
 	private int busyIconIndex = 0;
 	private JDialog aboutBox;
+	private JMenu mnSync;
 }
