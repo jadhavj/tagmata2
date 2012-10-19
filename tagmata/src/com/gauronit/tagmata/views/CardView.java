@@ -36,10 +36,12 @@ public class CardView extends javax.swing.JDialog {
             indexName = cardSnap.getDoc().get("indexName");
             indexDisplayName = MainView.mainView.getIndexDisplayName(indexName);
             indexNameLbl.setText("Card stored in index, '" + indexDisplayName + "'");
+            setTitle("Update Card");
         } else {
             indexDisplayName = MainView.mainView.getSelectedIndexDisplayName();
             indexName = MainView.mainView.getSelectedIndexName();
             indexNameLbl.setText("Index Selected is '" + indexDisplayName + "'");
+            setTitle("Save Card");
         }
         setSize(600, 500);
         textTxtBox.setSize(540, 440);
@@ -59,10 +61,12 @@ public class CardView extends javax.swing.JDialog {
             indexName = cardSnap.getDoc().get("indexName");
             indexDisplayName = MainView.mainView.getIndexDisplayName(indexName);
             indexNameLbl.setText("Card stored in index, '" + indexDisplayName + "'");
+            setTitle("Update Card");
         } else {
             indexDisplayName = MainView.mainView.getSelectedIndexDisplayName();
             indexName = MainView.mainView.getSelectedIndexName();
             indexNameLbl.setText("Index Selected is '" + indexDisplayName + "'");
+            setTitle("Save Card");
         }
     }
 
