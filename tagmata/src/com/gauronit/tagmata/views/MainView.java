@@ -497,28 +497,43 @@ public class MainView extends JFrame {
 		quickCards = new javax.swing.JList();
 		jLabel2 = new javax.swing.JLabel();
 		deleteQuickCard = new javax.swing.JLabel();
+		deleteQuickCard.setToolTipText("Delete selected Quick Cards");
 		resultsPanel = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		results = new javax.swing.JList();
 		jLabel3 = new javax.swing.JLabel();
 		searchText = new javax.swing.JTextField();
+		searchText.setToolTipText("Search Tagmata for cards");
 		allChkBox = new javax.swing.JCheckBox();
+		allChkBox.setToolTipText("Search all fields");
 		tagsChkBox = new javax.swing.JCheckBox();
+		tagsChkBox.setToolTipText("Search in 'Tags' fields");
 		titleChkBox = new javax.swing.JCheckBox();
+		titleChkBox.setToolTipText("Search in 'Title' fields");
 		textChkBox = new javax.swing.JCheckBox();
+		textChkBox.setToolTipText("Search in 'Text' fields");
 		jLabel5 = new javax.swing.JLabel();
+		jLabel5.setToolTipText("Search Tagmata");
 		newCardLbl = new javax.swing.JLabel();
+		newCardLbl.setToolTipText("Add new cards");
 		deleteCardLbl = new javax.swing.JLabel();
+		deleteCardLbl.setToolTipText("Delete selected cards");
 		superFuzzy = new javax.swing.JCheckBox();
+		superFuzzy.setToolTipText("<html>Search cards in 'Super Fuzzy' mode.<br/>For e.g. a search text 'demo' will include card with <br/>'demographics', 'demonstrations' etc. in their fields</html>");
 		addBookmarkLbl = new javax.swing.JLabel();
+		addBookmarkLbl.setToolTipText("Save selected cards as 'Quick Cards' for quick reference");
 		listAllCardsLbl = new javax.swing.JLabel();
+		listAllCardsLbl.setToolTipText("List all cards from selected indexes");
 		clearResultsLbl = new javax.swing.JLabel();
+		clearResultsLbl.setToolTipText("Clear search");
 		jPanel3 = new javax.swing.JPanel();
 		indexesScrollPane = new javax.swing.JScrollPane();
 		indexesTable = new javax.swing.JTable();
 		searchAllIndices = new javax.swing.JCheckBox();
 		addIndexLbl = new javax.swing.JLabel();
+		addIndexLbl.setToolTipText("Add new index");
 		deleteIndex = new javax.swing.JLabel();
+		deleteIndex.setToolTipText("Delete selected index");
 		menuBar = new javax.swing.JMenuBar();
 		javax.swing.JMenu fileMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
@@ -1024,7 +1039,7 @@ public class MainView extends JFrame {
 		});
 
 		deleteIndex.setIcon(resourceMap.getIcon("deleteIndex.icon")); // NOI18N
-		deleteIndex.setText(resourceMap.getString("deleteIndex.text")); // NOI18N
+		deleteIndex.setText("Remove selected index"); // NOI18N
 		deleteIndex.setName("deleteIndex"); // NOI18N
 		deleteIndex.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
