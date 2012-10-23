@@ -10,13 +10,16 @@
  ******************************************************************************/
 package com.gauronit.tagmata.service;
 
+import java.util.List;
+
+import com.gauronit.tagmata.schema.Card;
 import com.gauronit.tagmata.schema.FetchCardsResponse;
 import com.gauronit.tagmata.schema.RemoveSyncCardsResponse;
 import com.gauronit.tagmata.schema.SyncCardsResponse;
 import com.gauronit.tagmata.schema.TagmataException;
 
 public interface TagmataService {
-	public FetchCardsResponse fetchCardsRequest() throws TagmataException;
-	public SyncCardsResponse syncCardsRequest() throws TagmataException;
-	public RemoveSyncCardsResponse removeSyncCardsResponse() throws TagmataException;
+	public FetchCardsResponse fetchCards() throws TagmataException;
+	public SyncCardsResponse syncCards(List<Card> cards) throws TagmataException;
+	public RemoveSyncCardsResponse removeSyncCards(List<Card> cards) throws TagmataException;
 }

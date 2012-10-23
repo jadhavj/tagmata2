@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright (c) 2012, Gauronit, LLC.
-  All rights reserved. Tagmata and the accompanying materials
-  are made available under the terms of the GNU Public License v3.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/gpl.html
-  
-  Contributors:
-      Jayesh J - initial API and implementation
--->
+<!-- Copyright (c) 2012, Gauronit, LLC. All rights reserved. Tagmata and 
+	the accompanying materials are made available under the terms of the GNU 
+	Public License v3.0 which accompanies this distribution, and is available 
+	at http://www.gnu.org/licenses/gpl.html Contributors: Jayesh J - initial 
+	API and implementation -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oxm="http://www.springframework.org/schema/oxm"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-1.5.xsd">
 
-	<bean id="syncService" class="com.gauronit.tagmata.service.TagmataServiceImpl"
+	<bean id="tagmataService" class="com.gauronit.tagmata.service.TagmataServiceImpl"
 		init-method="initialize" />
 	<bean id="Tagmata"
 		class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
@@ -25,5 +20,56 @@
 	</bean>
 	<bean id="schema" class="org.springframework.xml.xsd.SimpleXsdSchema">
 		<property name="xsd" value="/WEB-INF/tagmata.xsd" />
+	</bean>
+
+	<bean id="validatingInterceptor"
+		class="org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor">
+		<property name="xsdSchema" ref="schema" />
+		<property name="validateRequest" value="true" />
+		<property name="validateResponse" value="true" />
+	</bean>
+
+	<bean id="loggingInterceptor"
+		class="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor" />
+
+	<oxm:jaxb2-marshaller id="marshaller"
+		contextPath="com.gauronit.tagmata.schema" />
+	<oxm:jaxb2-marshaller id="unmarshaller"
+		contextPath="com.gauronit.tagmata.schema" />
+
+	<bean id="fetchCardsEndpoint" class="com.gauronit.tagmata.endpoint.FetchCardsEndpoint"
+		autowire="byName" />
+	<bean id="syncCardsEndpoint" class="com.gauronit.tagmata.endpoint.SyncCardsEndpoint"
+		autowire="byName" />
+	<bean id="removeSyncCardsEndpoint" class="com.gauronit.tagmata.endpoint.RemoveSyncCardsEndpoint"
+		autowire="byName" />
+
+	<bean name="endpointMapping"
+		class="org.springframework.ws.server.endpoint.mapping.PayloadRootQNameEndpointMapping">
+		<property name="interceptors">
+			<list>
+				<ref local="loggingInterceptor" />
+				<ref local="validatingInterceptor" />
+			</list>
+		</property>
+		<property name="mappings">
+			<props>
+				<prop key="{http://www.gauronit.com/tagmata/schema}FetchCardsRequest">fetchCardsEndpoint</prop>
+				<prop key="{http://www.gauronit.com/tagmata/schema}SyncCardsRequest">syncCardsEndpoint</prop>
+				<prop
+					key="{http://www.gauronit.com/tagmata/schema}RemoveSyncCardsRequest">removeSyncCardsEndpoint</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="exceptionResolver"
+		class="org.springframework.ws.soap.server.endpoint.SoapFaultMappingExceptionResolver">
+		<property name="defaultFault" value="SERVER" />
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.springframework.oxm.ValidationFailureException">CLIENT,Invalid request</prop>
+				<prop key="com.gauronit.tagmata.schema.TagmataException">SERVER</prop>
+			</props>
+		</property>
 	</bean>
 </beans>

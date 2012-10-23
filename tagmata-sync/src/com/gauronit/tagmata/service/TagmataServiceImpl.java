@@ -10,6 +10,9 @@
  ******************************************************************************/
 package com.gauronit.tagmata.service;
 
+import java.util.List;
+
+import com.gauronit.tagmata.schema.Card;
 import com.gauronit.tagmata.schema.FetchCardsResponse;
 import com.gauronit.tagmata.schema.RemoveSyncCardsResponse;
 import com.gauronit.tagmata.schema.SyncCardsResponse;
@@ -18,26 +21,35 @@ import com.gauronit.tagmata.schema.TagmataException;
 public class TagmataServiceImpl implements TagmataService {
 
 	public void initialize() {
-		
+		System.out.println("Initialized.");
 	}
 	
 	@Override
-	public FetchCardsResponse fetchCardsRequest() throws TagmataException {
-		// TODO Auto-generated method stub
-		return null;
+	public FetchCardsResponse fetchCards() throws TagmataException {
+		FetchCardsResponse resp = new FetchCardsResponse();
+		Card card = new Card();
+		card.setTitle("title");
+		card.setTags("tags");
+		card.setText("text");
+		card.setAction("action");
+		card.setId("123abc");
+		resp.getCard().add(card);
+		return resp;
 	}
 
 	@Override
-	public SyncCardsResponse syncCardsRequest() throws TagmataException {
-		// TODO Auto-generated method stub
-		return null;
+	public SyncCardsResponse syncCards(List<Card> cards) throws TagmataException {
+		SyncCardsResponse resp = new SyncCardsResponse();
+		resp.setMessage("OK");
+		return resp;
 	}
 
 	@Override
-	public RemoveSyncCardsResponse removeSyncCardsResponse()
+	public RemoveSyncCardsResponse removeSyncCards(List<Card> cards)
 			throws TagmataException {
-		// TODO Auto-generated method stub
-		return null;
+		RemoveSyncCardsResponse resp = new RemoveSyncCardsResponse();
+		resp.setMessage("OK");
+		return resp;
 	}
 
 	
