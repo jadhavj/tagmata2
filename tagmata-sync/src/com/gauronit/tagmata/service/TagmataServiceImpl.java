@@ -10,7 +10,10 @@
  ******************************************************************************/
 package com.gauronit.tagmata.service;
 
+import java.io.File;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.gauronit.tagmata.schema.Card;
 import com.gauronit.tagmata.schema.FetchCardsResponse;
@@ -19,9 +22,12 @@ import com.gauronit.tagmata.schema.SyncCardsResponse;
 import com.gauronit.tagmata.schema.TagmataException;
 
 public class TagmataServiceImpl implements TagmataService {
+	
+	Logger logger = Logger.getLogger(TagmataServiceImpl.class);
 
 	public void initialize() {
-		System.out.println("Initialized.");
+		// start sync engine
+		logger.info("Initialized.");
 	}
 	
 	@Override
