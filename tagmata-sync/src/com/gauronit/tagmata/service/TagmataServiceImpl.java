@@ -10,7 +10,6 @@
  ******************************************************************************/
 package com.gauronit.tagmata.service;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
