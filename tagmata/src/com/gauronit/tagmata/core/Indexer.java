@@ -57,43 +57,50 @@ public class Indexer {
 	private static Indexer indexer;
 	private static String indexDir;
 	private static final String MAIN_INDEX = "main";
-	private IndexSearcher mainIndexSearcher;
-	private IndexWriter mainIndexWriter;
-	private Map<String, IndexSearcher> indexSearchers = new LinkedHashMap<String, IndexSearcher>();
 
 	private Indexer() {
 	}
 
 	public ArrayList getIndexNames() {
+		IndexSearcher mainIndexSearcher = null;
+		IndexReader ir = null;
 		try {
-			IndexReader ir = IndexReader.open(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX),
-					new SimpleFSLockFactory(indexDir + File.separator
-							+ MAIN_INDEX)));
+			ir = IndexReader.open(FSDirectory.open(new File(indexDir
+					+ File.separator + MAIN_INDEX), new SimpleFSLockFactory(
+					indexDir + File.separator + MAIN_INDEX)));
 			mainIndexSearcher = new IndexSearcher(ir);
-			ArrayList<String[]> indexNames = new ArrayList<String[]>();
-			for (Map.Entry index : indexSearchers.entrySet()) {
-				String indexName = (String) index.getKey();
-				Query q = new QueryParser(Version.LUCENE_35, "indexName",
-						new StandardAnalyzer(Version.LUCENE_35))
-						.parse(indexName);
-				TopScoreDocCollector collector = TopScoreDocCollector.create(1,
-						true);
-				mainIndexSearcher.search(q, collector);
-				ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
-				indexNames
-						.add(new String[] {
-								indexName,
-								mainIndexSearcher.doc(hits[0].doc).get(
-										"displayName") });
+			ArrayList<String[]> indexNames = new ArrayList<String[]>();
+
+			mainIndexSearcher = new IndexSearcher(ir);
+			Query q = new WildcardQuery(new Term("indexName", "*"));
+			TopScoreDocCollector collector = TopScoreDocCollector.create(10000,
+					false);
+			mainIndexSearcher.search(q, collector);
+			ScoreDoc[] hits = collector.topDocs().scoreDocs;
+			for (ScoreDoc hit : hits) {
+				Document doc = mainIndexSearcher.doc(hit.doc);
+				String indexName = doc.get("indexName");
+				String indexDisplayName = doc.get("displayName");
+				indexNames.add(new String[] { indexName, indexDisplayName });
 			}
-			ir.close();
-			mainIndexSearcher.close();
+
 			return indexNames;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
+		} finally {
+			try {
+				ir.close();
+				mainIndexSearcher.close();
+				ir = null;
+				mainIndexSearcher = null;
+			} catch (IOException e) {
+				logger.info("Error: Unable to close index.");
+				System.exit(0);
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -112,20 +119,20 @@ public class Indexer {
 
 	private synchronized void loadIndexes() throws Exception {
 		try {
-			Properties props = new Properties();
-			//props.load(new FileInputStream(new File("indexer.properties")));
+			// Properties props = new Properties();
+			// props.load(new FileInputStream(new File("indexer.properties")));
 			indexDir = new File(".").getCanonicalPath() + File.separator
 					+ "indexes"; // props.getProperty("indexDir");
-			IndexReader ir = null;
+
+			// Open or create main index --
 			try {
-				ir = IndexReader.open(FSDirectory.open(new File(indexDir
-						+ File.separator + MAIN_INDEX),
-						new SimpleFSLockFactory(indexDir + File.separator
-								+ MAIN_INDEX)));
-				mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
+				IndexWriter iw = new IndexWriter(FSDirectory.open(new File(
 						indexDir + File.separator + MAIN_INDEX)),
 						new IndexWriterConfig(Version.LUCENE_35,
 								new StandardAnalyzer(Version.LUCENE_35)));
+				iw.close();
+				iw = null;
+
 			} catch (Exception ex) {
 				try {
 					IndexWriter iw = new IndexWriter(FSDirectory.open(new File(
@@ -133,41 +140,16 @@ public class Indexer {
 							new IndexWriterConfig(Version.LUCENE_35,
 									new StandardAnalyzer(Version.LUCENE_35)));
 					iw.close();
-					mainIndexWriter = new IndexWriter(
-							FSDirectory.open(new File(indexDir + File.separator
-									+ MAIN_INDEX)), new IndexWriterConfig(
-									Version.LUCENE_35, new StandardAnalyzer(
-											Version.LUCENE_35)));
-					ir = IndexReader.open(FSDirectory.open(new File(indexDir
-							+ File.separator + MAIN_INDEX),
-							new SimpleFSLockFactory(indexDir + File.separator
-									+ MAIN_INDEX)));
+					iw = null;
 				} catch (Exception e) {
 					logger.log(Level.SEVERE, "Failed creating main index", e);
 					System.exit(0);
 				}
 			}
-			mainIndexSearcher = new IndexSearcher(ir);
-			Query q = new WildcardQuery(new Term("indexName", "*"));
-			TopScoreDocCollector collector = TopScoreDocCollector.create(10000,
-					false);
-			mainIndexSearcher.search(q, collector);
-			ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			for (ScoreDoc hit : hits) {
-				Document doc = mainIndexSearcher.doc(hit.doc);
-				String indexName = doc.get("indexName");
-				IndexReader reader = IndexReader.open(FSDirectory.open(
-						new File(indexDir + File.separator + indexName),
-						new SimpleFSLockFactory(indexDir + File.separator
-								+ indexName)));
-				IndexSearcher searcher = new IndexSearcher(reader);
-				indexSearchers.put(indexName, searcher);
-			}
+			// --
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Failed to load indexes", ex);
 			throw ex;
-		} finally {
-			mainIndexWriter.close();
 		}
 		loaded = true;
 	}
@@ -183,13 +165,7 @@ public class Indexer {
 			iw.prepareCommit();
 			iw.commit();
 			iw.close();
-			// indexWriters.put(indexName, iw);
-			IndexReader ir = IndexReader.open(FSDirectory.open(new File(
-					indexDir + File.separator + indexName),
-					new SimpleFSLockFactory(indexDir + File.separator
-							+ indexName)));
-			IndexSearcher is = new IndexSearcher(ir);
-			indexSearchers.put(indexName, is);
+			iw = null;
 
 			Document doc = new Document();
 			doc.add(new Field("displayName", indexDisplayName, Store.YES,
@@ -197,17 +173,15 @@ public class Indexer {
 			doc.add(new Field("indexName", indexName, Store.YES,
 					Index.NOT_ANALYZED));
 
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			IndexWriter mainIndexWriter = new IndexWriter(
+					FSDirectory.open(new File(indexDir + File.separator
+							+ MAIN_INDEX)), new IndexWriterConfig(
+							Version.LUCENE_35, new StandardAnalyzer(
+									Version.LUCENE_35)));
 			mainIndexWriter.addDocument(doc);
 			mainIndexWriter.commit();
 			mainIndexWriter.close();
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			mainIndexWriter = null;
 			return indexName;
 		} catch (IOException ex) {
 			Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null,
@@ -218,18 +192,17 @@ public class Indexer {
 
 	public void deleteIndex(String indexName) {
 		try {
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			IndexWriter mainIndexWriter = new IndexWriter(
+					FSDirectory.open(new File(indexDir + File.separator
+							+ MAIN_INDEX)), new IndexWriterConfig(
+							Version.LUCENE_35, new StandardAnalyzer(
+									Version.LUCENE_35)));
 			Query q = new QueryParser(Version.LUCENE_35, "indexName",
 					new StandardAnalyzer(Version.LUCENE_35)).parse(indexName);
 			mainIndexWriter.deleteDocuments(q);
 			mainIndexWriter.commit();
 			mainIndexWriter.close();
-			indexSearchers.get(indexName).getIndexReader().close();
-			indexSearchers.get(indexName).close();
-			indexSearchers.remove(indexName);
+			mainIndexWriter = null;
 
 			IndexWriter writer = new IndexWriter(FSDirectory.open(new File(
 					indexDir + File.separator + indexName)),
@@ -239,6 +212,7 @@ public class Indexer {
 			writer.prepareCommit();
 			writer.commit();
 			writer.close();
+			writer = null;
 
 			IOUtil.deleteDir(new File(indexDir + File.separator + indexName));
 		} catch (Exception ex) {
@@ -249,11 +223,11 @@ public class Indexer {
 
 	public void renameIndex(String indexName, String indexDisplayName) {
 		try {
-			mainIndexWriter.close();
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			IndexWriter mainIndexWriter = new IndexWriter(
+					FSDirectory.open(new File(indexDir + File.separator
+							+ MAIN_INDEX)), new IndexWriterConfig(
+							Version.LUCENE_35, new StandardAnalyzer(
+									Version.LUCENE_35)));
 			Document doc = new Document();
 			doc.add(new Field("displayName", indexDisplayName, Store.YES,
 					Index.NOT_ANALYZED));
@@ -266,6 +240,7 @@ public class Indexer {
 			mainIndexWriter.commit();
 
 			mainIndexWriter.close();
+			mainIndexWriter = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -283,6 +258,7 @@ public class Indexer {
 				writer.prepareCommit();
 				writer.commit();
 				writer.close();
+				writer = null;
 			}
 		} catch (Exception ex) {
 		}
@@ -308,6 +284,7 @@ public class Indexer {
 			writer.prepareCommit();
 			writer.commit();
 			writer.close();
+			writer = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -315,11 +292,11 @@ public class Indexer {
 
 	public void saveBookmark(String id, String indexName) {
 		try {
-			mainIndexWriter.close();
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			IndexWriter mainIndexWriter = new IndexWriter(
+					FSDirectory.open(new File(indexDir + File.separator
+							+ MAIN_INDEX)), new IndexWriterConfig(
+							Version.LUCENE_35, new StandardAnalyzer(
+									Version.LUCENE_35)));
 
 			Document doc = new Document();
 			doc.add(new Field("qcId", id, Store.YES, Index.NOT_ANALYZED));
@@ -330,6 +307,7 @@ public class Indexer {
 			mainIndexWriter.prepareCommit();
 			mainIndexWriter.commit();
 			mainIndexWriter.close();
+			mainIndexWriter = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -337,14 +315,16 @@ public class Indexer {
 
 	public void deleteBookmark(String id, String indexName) {
 		try {
-			mainIndexWriter = new IndexWriter(FSDirectory.open(new File(
-					indexDir + File.separator + MAIN_INDEX)),
-					new IndexWriterConfig(Version.LUCENE_35,
-							new StandardAnalyzer(Version.LUCENE_35)));
+			IndexWriter mainIndexWriter = new IndexWriter(
+					FSDirectory.open(new File(indexDir + File.separator
+							+ MAIN_INDEX)), new IndexWriterConfig(
+							Version.LUCENE_35, new StandardAnalyzer(
+									Version.LUCENE_35)));
 			mainIndexWriter.deleteDocuments(new Term("qcId", id));
 			mainIndexWriter.prepareCommit();
 			mainIndexWriter.commit();
 			mainIndexWriter.close();
+			mainIndexWriter = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -358,7 +338,7 @@ public class Indexer {
 					indexDir + File.separator + MAIN_INDEX),
 					new SimpleFSLockFactory(indexDir + File.separator
 							+ MAIN_INDEX)));
-			mainIndexSearcher = new IndexSearcher(ir);
+			IndexSearcher mainIndexSearcher = new IndexSearcher(ir);
 
 			Query q = new WildcardQuery(new Term("qcId", "*"));
 			TopScoreDocCollector collector = TopScoreDocCollector.create(10000,
@@ -382,7 +362,15 @@ public class Indexer {
 				doc = searcher.doc(hits2[0].doc);
 
 				cardSnaps.add(new CardSnapshot("", doc));
+				reader.close();
+				searcher.close();
+				reader = null;
+				searcher = null;
 			}
+			ir.close();
+			mainIndexSearcher.close();
+			ir = null;
+			mainIndexSearcher = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -412,6 +400,7 @@ public class Indexer {
 			writer.prepareCommit();
 			writer.commit();
 			writer.close();
+			writer = null;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -484,6 +473,9 @@ public class Indexer {
 
 					cardSnaps.add(new CardSnapshot(highlights, doc));
 				}
+				searcher.getIndexReader().close();
+				searcher.close();
+				searcher = null;
 			}
 
 		} catch (Exception ex) {
@@ -502,7 +494,7 @@ public class Indexer {
 			writer.prepareCommit();
 			writer.commit();
 			writer.close();
-			
+
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "Failed to Initialize", ex);
 		}
